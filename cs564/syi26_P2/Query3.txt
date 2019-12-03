@@ -1,0 +1,51 @@
+--Student ID: 9075297896
+
+--Create a table that takes care of the regional order volume
+WITH REG AS (
+    SELECT N1.N_NAME AS NAME_REG, SUM(L_QUANTITY*(L_EXTENDEDPRICE-L_DISCOUNT)) AS REG_VOL
+    FROM (
+        SELECT *
+        FROM SUPPLIER, CUSTOMER, PARTSUPP, ORDERS, LINEITEM
+        WHERE S_SUPPKEY = PS_SUPPKEY
+            AND PS_SUPPKEY = L_SUPPKEY
+            AND PS_PARTKEY = L_PARTKEY
+            AND C_CUSTKEY = O_CUSTKEY
+            AND O_ORDERKEY = L_ORDERKEY
+    )
+    --Link suppliers to their nation
+    JOIN NATION N1
+    ON S_NATIONKEY = N1.N_NATIONKEY
+    --Link customers to their nation
+    JOIN NATION N2
+    ON C_NATIONKEY = N2.N_NATIONKEY
+    --Make sure that suppliers and customers are from the same region
+    WHERE N1.N_REGIONKEY = N2.N_REGIONKEY
+    GROUP BY N1.N_NAME
+    --Create a table that takes care of the non-regional order volume
+) , NON_REG AS (
+    SELECT N1.N_NAME AS NAME_NON_REG, SUM(L_QUANTITY*(L_EXTENDEDPRICE-L_DISCOUNT)) AS NON_REG_VOL
+    FROM (
+        SELECT *
+        FROM SUPPLIER, CUSTOMER, PARTSUPP, ORDERS, LINEITEM
+        WHERE S_SUPPKEY = PS_SUPPKEY
+            AND PS_SUPPKEY = L_SUPPKEY
+            AND PS_PARTKEY = L_PARTKEY
+            AND C_CUSTKEY = O_CUSTKEY
+            AND O_ORDERKEY = L_ORDERKEY
+    )
+    --Link suppliers to their nation
+    JOIN NATION N1
+    ON S_NATIONKEY = N1.N_NATIONKEY
+    --Link customers to their nation
+    JOIN NATION N2
+    ON C_NATIONKEY = N2.N_NATIONKEY
+    --Make sure that suppliers and customers are from different regions
+    WHERE N1.N_REGIONKEY <> N2.N_REGIONKEY
+    GROUP BY N1.N_NAME
+)
+
+SELECT NAME_REG, REG_VOL, NON_REG_VOL 
+FROM REG, NON_REG
+WHERE NAME_REG = NAME_NON_REG
+--Order the table by regional order volume size
+ORDER BY REG_VOL DESC;

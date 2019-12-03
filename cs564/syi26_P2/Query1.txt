@@ -1,0 +1,13 @@
+--Student ID: 9075297896
+
+SELECT C_NAME, O_ORDERKEY, SUM(L_QUANTITY*(L_EXTENDEDPRICE - L_DISCOUNT)) AS SIZE
+FROM LINEITEM, ORDERS, CUSTOMER
+--Link lineitems with the customers who ordered them
+WHERE L_ORDERKEY = O_ORDERKEY
+    AND O_CUSTKEY = C_CUSTKEY
+--Make sure that each row represents an order
+GROUP BY O_ORDERKEY
+--Order the table by order size in descending order
+ORDER BY SIZE DESC
+--Choose to show the first 20 rows
+LIMIT 20;

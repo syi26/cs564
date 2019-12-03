@@ -1,0 +1,16 @@
+--Student ID: 9075297896
+
+SELECT N_NAME, SUM(L_QUANTITY*(L_EXTENDEDPRICE-L_DISCOUNT)) AS TOTAL_VOLUME
+FROM NATION, ORDERS, CUSTOMER, LINEITEM, SUPPLIER, PARTSUPP
+--Link lineitems with the nation in which they are ordered
+WHERE N_NATIONKEY = S_NATIONKEY
+    AND S_NATIONKEY = C_NATIONKEY
+    AND C_CUSTKEY = O_CUSTKEY
+    AND O_ORDERKEY = L_ORDERKEY
+    AND S_SUPPKEY = PS_SUPPKEY
+    AND PS_SUPPKEY = L_SUPPKEY
+    AND PS_PARTKEY = L_PARTKEY
+--Make sure that each row represents a nation
+GROUP BY N_NATIONKEY
+--Order the table by alphabetical order of nation name
+ORDER BY N_NAME;

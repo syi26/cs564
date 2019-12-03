@@ -1,0 +1,18 @@
+--Student ID: 9075297896
+
+SELECT S_NAME, CUST_NUM
+FROM (
+    --Take care of each customer for each supplier only once
+    SELECT S_NAME, COUNT (DISTINCT C_CUSTKEY) AS CUST_NUM
+    FROM SUPPLIER, CUSTOMER, PARTSUPP, ORDERS, LINEITEM
+    WHERE S_SUPPKEY = PS_SUPPKEY
+        AND PS_PARTKEY = L_PARTKEY
+        AND PS_SUPPKEY = L_SUPPKEY
+        AND C_CUSTKEY = O_CUSTKEY
+        AND O_ORDERKEY = L_ORDERKEY
+    GROUP BY S_NAME
+)
+--Choose the suppliers that have more than 615 customers
+WHERE CUST_NUM > 615
+--Order the table by descending order of number of customers
+ORDER BY CUST_NUM  DESC;
